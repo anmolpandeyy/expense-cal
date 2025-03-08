@@ -9,6 +9,7 @@ import { AddTransactionForm } from '@/components/forms/AddTransactionForm';
 import { Drawer } from '@/components/shared/Drawer';
 import { ExpenseChart } from '@/components/shared/ExpenseChart';
 import { TransactionDetails } from '@/components/shared/TransactionDetails';
+import { ExportForm } from '@/components/forms/ExportForm';
 import { useAppStore } from '@/lib/store';
 
 /**
@@ -28,7 +29,7 @@ export default function Home() {
   const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null);
   
   // Store actions
-  const { exportData, importData } = useAppStore();
+  const { exportData, importData, importCSV } = useAppStore();
   
   /**
    * Handle client-side mounting to prevent hydration errors.
@@ -53,21 +54,30 @@ export default function Home() {
         break;
       case 'export':
         setCurrentView('export');
-        handleExport();
         break;
       case 'import':
         setCurrentView('import');
         // Open file input
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.json';
+        input.accept = '.json,.csv,text/csv,application/vnd.ms-excel,application/csv';
         input.onchange = (e) => {
           const file = (e.target as HTMLInputElement).files?.[0];
           if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
               const content = event.target?.result as string;
-              importData(content);
+              
+              // Determine file type by extension
+              const isCSV = file.name.toLowerCase().endsWith('.csv');
+              
+              if (isCSV) {
+                // Import CSV data
+                importCSV(content);
+              } else {
+                // Import JSON data
+                importData(content);
+              }
             };
             reader.readAsText(file);
           }
@@ -80,30 +90,6 @@ export default function Home() {
     }
   };
   
-  /**
-   * Handles exporting application data to a JSON file.
-   * Creates a downloadable file with all transactions and categories.
-   */
-  const handleExport = () => {
-    try {
-      const data = exportData();
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `expense-data-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      setCurrentView('main');
-    } catch (error) {
-      console.error('Export failed:', error);
-    }
-  };
-
   /**
    * Handles refreshing the main view.
    * Resets the current view to the main screen.
@@ -183,6 +169,13 @@ export default function Home() {
         onClose={handleCloseTransactionDetails}
         onEdit={handleEditTransaction}
       />
+    );
+  }
+  
+  // Render export form if export view is active
+  if (currentView === 'export') {
+    return (
+      <ExportForm onClose={() => setCurrentView('main')} />
     );
   }
   

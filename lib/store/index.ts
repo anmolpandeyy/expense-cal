@@ -4,7 +4,8 @@ import { AppState, Transaction, MonthData } from '../types';
 import { 
   getCurrentMonth, 
   generateId, 
-  calculateMonthData 
+  calculateMonthData,
+  parseCSVData
 } from '../utils';
 
 /**
@@ -157,6 +158,54 @@ export const useAppStore = create<AppState>()(
           });
         } catch (error) {
           console.error('Failed to import data:', error);
+        }
+      },
+
+      /**
+       * Imports data from a CSV file.
+       * Parses the CSV format and adds transactions to the store.
+       * 
+       * @param csvData - CSV data as a string
+       */
+      importCSV: (csvData: string) => {
+        try {
+          const { transactions: newTransactions, newCategories } = parseCSVData(csvData);
+          
+          set((state) => {
+            // Generate IDs for new transactions
+            const transactionsWithIds = newTransactions.map(t => ({
+              ...t,
+              id: generateId()
+            }));
+            
+            // Merge transactions
+            const allTransactions = [...state.transactions, ...transactionsWithIds];
+            
+            // Merge categories (avoiding duplicates)
+            const existingCategoryIds = new Set(state.categories.map(c => c.id));
+            const categoriesToAdd = newCategories.filter(c => !existingCategoryIds.has(c.id));
+            const allCategories = [...state.categories, ...categoriesToAdd];
+            
+            // Recalculate monthly data
+            const monthlyData = recalculateMonthlyData(allTransactions, state.currentMonth);
+            
+            return {
+              transactions: allTransactions,
+              categories: allCategories,
+              monthlyData,
+            };
+          });
+          
+          return {
+            success: true,
+            message: `Imported ${newTransactions.length} transactions and ${newCategories.length} new categories.`
+          };
+        } catch (error) {
+          console.error('Failed to import CSV data:', error);
+          return {
+            success: false,
+            message: error instanceof Error ? error.message : 'Unknown error'
+          };
         }
       },
     }),
