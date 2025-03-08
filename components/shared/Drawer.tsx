@@ -7,17 +7,38 @@ import {
   X
 } from 'lucide-react';
 
+/**
+ * Props for the Drawer component.
+ */
 interface DrawerProps {
+  /** Whether the drawer is open */
   isOpen: boolean;
+  /** Callback function to close the drawer */
   onClose: () => void;
+  /** Callback function when a navigation item is selected */
   onNavigate: (route: string) => void;
 }
 
+/**
+ * Drawer component.
+ * Provides a slide-in menu with navigation options and an About modal.
+ * 
+ * @param props - Component props
+ * @param props.isOpen - Whether the drawer is open
+ * @param props.onClose - Callback function to close the drawer
+ * @param props.onNavigate - Callback function when a navigation item is selected
+ * @returns Drawer component or null if closed
+ */
 export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, onNavigate }) => {
   const [showAbout, setShowAbout] = useState(false);
   
+  // Don't render anything if the drawer is closed
   if (!isOpen) return null;
 
+  /**
+   * Menu items configuration.
+   * Each item has an icon, label, and action function.
+   */
   const menuItems = [
     { icon: <BarChart3 className="w-5 h-5" />, label: 'Chart', action: () => onNavigate('chart') },
     { icon: <Download className="w-5 h-5" />, label: 'Export', action: () => onNavigate('export') },
@@ -25,6 +46,12 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, onNavigate }) =
     { icon: <Info className="w-5 h-5" />, label: 'About', action: () => setShowAbout(true) },
   ];
 
+  /**
+   * About modal component.
+   * Displays information about the application.
+   * 
+   * @returns About modal component
+   */
   const AboutModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">

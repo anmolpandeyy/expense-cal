@@ -11,20 +11,39 @@ import { ExpenseChart } from '@/components/shared/ExpenseChart';
 import { TransactionDetails } from '@/components/shared/TransactionDetails';
 import { useAppStore } from '@/lib/store';
 
+/**
+ * Main application page component.
+ * Handles the overall layout and navigation between different views.
+ * Manages state for transaction operations and UI interactions.
+ */
 export default function Home() {
+  // UI state
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'main' | 'chart' | 'export' | 'import'>('main');
   const [isMounted, setIsMounted] = useState(false);
+  
+  // Transaction state
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
   const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null);
+  
+  // Store actions
   const { exportData, importData } = useAppStore();
   
-  // Handle client-side mounting to prevent hydration errors
+  /**
+   * Handle client-side mounting to prevent hydration errors.
+   * Next.js requires this to ensure client-side state matches server-side.
+   */
   useEffect(() => {
     setIsMounted(true);
   }, []);
   
+  /**
+   * Handles navigation between different app views.
+   * Triggered by the drawer menu options.
+   * 
+   * @param route - The route/view to navigate to
+   */
   const handleNavigate = (route: string) => {
     setIsDrawerOpen(false);
     
@@ -61,6 +80,10 @@ export default function Home() {
     }
   };
   
+  /**
+   * Handles exporting application data to a JSON file.
+   * Creates a downloadable file with all transactions and categories.
+   */
   const handleExport = () => {
     try {
       const data = exportData();
@@ -81,31 +104,57 @@ export default function Home() {
     }
   };
 
+  /**
+   * Handles refreshing the main view.
+   * Resets the current view to the main screen.
+   */
   const handleRefresh = () => {
-    // Refresh data or reset view as needed
     setCurrentView('main');
   };
   
+  /**
+   * Handles clicking on a transaction in the list.
+   * Shows the transaction details view.
+   * 
+   * @param id - ID of the clicked transaction
+   */
   const handleTransactionClick = (id: string) => {
     setSelectedTransactionId(id);
   };
   
+  /**
+   * Handles closing the transaction details view.
+   * Returns to the main view.
+   */
   const handleCloseTransactionDetails = () => {
     setSelectedTransactionId(null);
   };
   
+  /**
+   * Handles editing a transaction.
+   * Opens the transaction form with the selected transaction data.
+   * 
+   * @param id - ID of the transaction to edit
+   */
   const handleEditTransaction = (id: string) => {
     setEditingTransactionId(id);
     setSelectedTransactionId(null);
     setIsAddingTransaction(true);
   };
   
+  /**
+   * Handles closing the transaction form.
+   * Returns to the previous view.
+   */
   const handleCloseTransactionForm = () => {
     setIsAddingTransaction(false);
     setEditingTransactionId(null);
   };
   
-  // Function to handle empty state
+  /**
+   * Handles adding a transaction from the empty state.
+   * Opens the transaction form.
+   */
   const handleEmptyStateAdd = () => {
     setIsAddingTransaction(true);
   };

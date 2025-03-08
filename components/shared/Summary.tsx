@@ -2,9 +2,18 @@ import React from 'react';
 import { useAppStore } from '@/lib/store';
 import { formatCurrency } from '@/lib/utils';
 
+/**
+ * Summary component.
+ * Displays a financial summary with income, expenses, and balance.
+ * Shows data for the currently selected month.
+ * 
+ * @returns Summary component with financial overview
+ */
 export const Summary: React.FC = () => {
+  // Get current month and data from store
   const { currentMonth, monthlyData } = useAppStore();
   
+  // Get current month data or use empty defaults
   const currentMonthData = monthlyData[currentMonth] || {
     income: 0,
     expenses: 0,

@@ -7,7 +7,10 @@ import {
   calculateMonthData 
 } from '../utils';
 
-// Default categories
+/**
+ * Default categories for expenses and income.
+ * These are pre-populated in the store when the app is first initialized.
+ */
 const defaultCategories = [
   { id: 'food', name: 'Food', icon: '🍔', type: 'expense' },
   { id: 'transportation', name: 'Transportation', icon: '🚌', type: 'expense' },
@@ -25,6 +28,10 @@ const defaultCategories = [
   { id: 'other_income', name: 'Other Income', icon: '💵', type: 'income' },
 ] as const;
 
+/**
+ * Main application store using Zustand.
+ * Implements the AppState interface and persists data to localStorage.
+ */
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -33,6 +40,12 @@ export const useAppStore = create<AppState>()(
       transactions: [],
       monthlyData: {},
 
+      /**
+       * Adds a new transaction to the store.
+       * Generates a unique ID and recalculates monthly data.
+       * 
+       * @param transaction - Transaction data without ID
+       */
       addTransaction: (transaction) => {
         const newTransaction = {
           ...transaction,
@@ -50,6 +63,12 @@ export const useAppStore = create<AppState>()(
         });
       },
 
+      /**
+       * Deletes a transaction from the store.
+       * Recalculates monthly data after deletion.
+       * 
+       * @param id - ID of the transaction to delete
+       */
       deleteTransaction: (id) => {
         set((state) => {
           const transactions = state.transactions.filter(t => t.id !== id);
@@ -62,6 +81,13 @@ export const useAppStore = create<AppState>()(
         });
       },
 
+      /**
+       * Updates an existing transaction with new data.
+       * Recalculates monthly data after update.
+       * 
+       * @param id - ID of the transaction to update
+       * @param updatedFields - Partial transaction data to update
+       */
       updateTransaction: (id, updatedFields) => {
         set((state) => {
           const transactions = state.transactions.map(t => 
@@ -76,6 +102,12 @@ export const useAppStore = create<AppState>()(
         });
       },
 
+      /**
+       * Changes the currently selected month.
+       * Recalculates monthly data for the new month.
+       * 
+       * @param month - Month to select in YYYY-MM format
+       */
       setCurrentMonth: (month) => {
         set((state) => {
           const monthlyData = recalculateMonthlyData(state.transactions, month);
@@ -87,11 +119,23 @@ export const useAppStore = create<AppState>()(
         });
       },
 
+      /**
+       * Exports all application data as a JSON string.
+       * Includes transactions and categories.
+       * 
+       * @returns JSON string of app data
+       */
       exportData: () => {
         const { transactions, categories } = get();
         return JSON.stringify({ transactions, categories });
       },
 
+      /**
+       * Imports application data from a JSON string.
+       * Validates the data format before importing.
+       * 
+       * @param data - JSON string containing app data
+       */
       importData: (data) => {
         try {
           const parsedData = JSON.parse(data);
@@ -122,7 +166,14 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Helper function to recalculate monthly data
+/**
+ * Helper function to recalculate monthly data for all relevant months.
+ * Extracts unique months from transactions and calculates data for each.
+ * 
+ * @param transactions - All transactions
+ * @param currentMonth - Currently selected month
+ * @returns Record of monthly data indexed by month string
+ */
 function recalculateMonthlyData(
   transactions: Transaction[], 
   currentMonth: string

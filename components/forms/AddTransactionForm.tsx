@@ -4,17 +4,34 @@ import { TransactionType } from '@/lib/types';
 import { ChevronLeft, Check, Calendar, ChevronDown } from 'lucide-react';
 import { format, parse, addDays, subDays } from 'date-fns';
 
+/**
+ * Props for the AddTransactionForm component.
+ */
 interface AddTransactionFormProps {
+  /** Callback function to close the form */
   onClose: () => void;
+  /** Optional ID of transaction to edit */
   transactionId?: string;
 }
 
+/**
+ * AddTransactionForm component.
+ * Provides a form for adding or editing transactions.
+ * Includes a calculator, date picker, and category selection.
+ * 
+ * @param props - Component props
+ * @param props.onClose - Callback function to close the form
+ * @param props.transactionId - Optional ID of transaction to edit
+ * @returns Transaction form component
+ */
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ 
   onClose,
   transactionId
 }) => {
+  // Get store actions and data
   const { categories, addTransaction, transactions, updateTransaction } = useAppStore();
   
+  // Form state
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -26,26 +43,37 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   
-  // Handle client-side mounting to prevent hydration errors
+  /**
+   * Handle client-side mounting to prevent hydration errors.
+   * Next.js requires this to ensure client-side state matches server-side.
+   */
   useEffect(() => {
     setIsMounted(true);
   }, []);
   
-  // Load transaction data if editing
+  /**
+   * Load transaction data if editing an existing transaction.
+   * Populates the form with the transaction's data.
+   */
   useEffect(() => {
     if (isMounted && transactionId) {
+      console.log('Loading transaction data for editing:', transactionId);
       const transaction = transactions.find(t => t.id === transactionId);
       if (transaction) {
+        console.log('Found transaction:', transaction);
         setIsEditing(true);
         setType(transaction.type);
         setAmount(transaction.amount.toString());
         setDescription(transaction.description || '');
         setCategoryId(transaction.categoryId);
         setTransactionDate(new Date(transaction.date));
+      } else {
+        console.log('Transaction not found');
       }
     }
   }, [isMounted, transactionId, transactions]);
   
+  // Filter categories based on selected transaction type
   const filteredCategories = categories.filter(category => category.type === type);
   
   // Reset expression when amount changes
@@ -55,6 +83,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     }
   }, [amount, isCalculating]);
   
+  /**
+   * Handles form submission.
+   * If in calculation mode, evaluates the expression.
+   * Otherwise, adds or updates the transaction.
+   */
   const handleSubmit = () => {
     if (isCalculating) {
       try {
@@ -90,6 +123,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     onClose();
   };
   
+  /**
+   * Handles numpad button presses.
+   * Manages both calculator mode and normal input mode.
+   * 
+   * @param key - The key that was pressed (number, operator, or special key)
+   */
   const handleNumpadPress = (key: string | number) => {
     if (isCalculating) {
       // In calculation mode
@@ -132,25 +171,41 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
   
   const selectedCategory = categories.find(c => c.id === categoryId);
   
-  // Date picker component
+  /**
+   * Date picker component.
+   * Allows selecting a date for the transaction.
+   * Provides month, day, and year selection.
+   * 
+   * @returns Date picker component
+   */
   const DatePicker = () => {
     const [selectedYear, setSelectedYear] = useState<number>(transactionDate.getFullYear());
     const [selectedMonth, setSelectedMonth] = useState<number>(transactionDate.getMonth());
     const [selectedDay, setSelectedDay] = useState<number>(transactionDate.getDate());
     
+    // Month names for the dropdown
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     
+    // Generate a range of years (5 years before and 4 years after current year)
     const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i);
     
+    /**
+     * Confirms the selected date and closes the picker.
+     * Creates a new Date object from the selected year, month, and day.
+     */
     const confirmDate = () => {
       const newDate = new Date(selectedYear, selectedMonth, selectedDay);
       setTransactionDate(newDate);
       setIsDatePickerOpen(false);
     };
     
+    /**
+     * Handles navigating to the previous day.
+     * Updates year, month, and day state accordingly.
+     */
     const handlePrevDay = () => {
       const currentDate = new Date(selectedYear, selectedMonth, selectedDay);
       const prevDate = subDays(currentDate, 1);
@@ -159,6 +214,10 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
       setSelectedDay(prevDate.getDate());
     };
     
+    /**
+     * Handles navigating to the next day.
+     * Updates year, month, and day state accordingly.
+     */
     const handleNextDay = () => {
       const currentDate = new Date(selectedYear, selectedMonth, selectedDay);
       const nextDate = addDays(currentDate, 1);

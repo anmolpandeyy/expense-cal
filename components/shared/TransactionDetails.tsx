@@ -4,12 +4,29 @@ import { useAppStore } from '@/lib/store';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils';
 
+/**
+ * Props for the TransactionDetails component.
+ */
 interface TransactionDetailsProps {
+  /** ID of the transaction to display */
   transactionId: string;
+  /** Callback function to close the details view */
   onClose: () => void;
+  /** Callback function to edit the transaction */
   onEdit: (id: string) => void;
 }
 
+/**
+ * TransactionDetails component.
+ * Displays detailed information about a specific transaction.
+ * Provides options to edit or delete the transaction.
+ * 
+ * @param props - Component props
+ * @param props.transactionId - ID of the transaction to display
+ * @param props.onClose - Callback function to close the details view
+ * @param props.onEdit - Callback function to edit the transaction
+ * @returns Transaction details component
+ */
 export const TransactionDetails: React.FC<TransactionDetailsProps> = ({ 
   transactionId, 
   onClose,
@@ -18,14 +35,22 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   const { transactions, categories, deleteTransaction } = useAppStore();
   const [isMounted, setIsMounted] = useState(false);
   
-  // Handle client-side mounting to prevent hydration errors
+  /**
+   * Handle client-side mounting to prevent hydration errors.
+   * Next.js requires this to ensure client-side state matches server-side.
+   */
   useEffect(() => {
     setIsMounted(true);
   }, []);
   
+  // Find the transaction and its category
   const transaction = transactions.find(t => t.id === transactionId);
   const category = transaction ? categories.find(c => c.id === transaction.categoryId) : null;
   
+  /**
+   * Handles deleting the transaction.
+   * Deletes the transaction and closes the details view.
+   */
   const handleDelete = () => {
     if (transaction) {
       deleteTransaction(transaction.id);
@@ -33,6 +58,10 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
     }
   };
   
+  /**
+   * Handles editing the transaction.
+   * Calls the onEdit callback with the transaction ID.
+   */
   const handleEdit = () => {
     if (transaction) {
       onEdit(transaction.id);
@@ -65,11 +94,13 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
     );
   }
   
+  // Format the date and determine if it's an expense
   const formattedDate = format(new Date(transaction.date), 'dd MMM yyyy');
   const isExpense = transaction.type === 'expense';
   
   return (
     <div className="flex flex-col h-full bg-slate-50">
+      {/* Header with back and delete buttons */}
       <header className="flex items-center justify-between p-4 border-b bg-white">
         <button 
           onClick={onClose}
@@ -92,6 +123,7 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
       
       <div className="flex-1 p-4">
         <div className="bg-white rounded-lg shadow-sm p-6">
+          {/* Category header with icon */}
           <div className="flex items-center mb-8">
             <div 
               className="w-16 h-16 rounded-full flex items-center justify-center mr-4"
@@ -111,6 +143,7 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
             </div>
           </div>
           
+          {/* Transaction details */}
           <div className="space-y-4 mb-8">
             <div className="flex justify-between py-3 border-b border-slate-100">
               <span className="text-slate-400">Category</span>
@@ -135,6 +168,7 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
             )}
           </div>
           
+          {/* Edit button */}
           <button
             onClick={handleEdit}
             className="w-full py-3 bg-amber-400 text-white rounded-lg flex items-center justify-center"
