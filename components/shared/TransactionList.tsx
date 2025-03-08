@@ -38,6 +38,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({ onTransactionC
           sum + (t.type === 'income' ? t.amount : -t.amount), 0
         );
         
+        // Sort transactions within each day to show newest first
+        const sortedTransactions = [...dailyTransactions].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
         return (
           <div key={date} className="bg-white mb-2">
             <div className="flex justify-between items-center px-4 py-3 bg-slate-50">
@@ -48,7 +53,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ onTransactionC
             </div>
             
             <div className="divide-y">
-              {dailyTransactions.map(transaction => {
+              {sortedTransactions.map(transaction => {
                 const category = categories.find(c => c.id === transaction.categoryId);
                 
                 return (

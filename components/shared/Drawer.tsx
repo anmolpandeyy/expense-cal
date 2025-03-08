@@ -3,9 +3,7 @@ import {
   BarChart3, 
   Download, 
   Upload, 
-  Star, 
   Info, 
-  Grid3X3,
   X
 } from 'lucide-react';
 
@@ -22,10 +20,8 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, onNavigate }) =
 
   const menuItems = [
     { icon: <BarChart3 className="w-5 h-5" />, label: 'Chart', action: () => onNavigate('chart') },
-    { icon: <Grid3X3 className="w-5 h-5" />, label: 'Categories', action: () => onNavigate('categories') },
     { icon: <Download className="w-5 h-5" />, label: 'Export', action: () => onNavigate('export') },
     { icon: <Upload className="w-5 h-5" />, label: 'Import', action: () => onNavigate('import') },
-    { icon: <Star className="w-5 h-5" />, label: 'Rate Us', action: () => onNavigate('rate') },
     { icon: <Info className="w-5 h-5" />, label: 'About', action: () => setShowAbout(true) },
   ];
 
@@ -45,21 +41,20 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, onNavigate }) =
         
         <div className="space-y-4">
           <p className="text-slate-600">
-            Made with ❤️ by Anmol Pandey with help of his Friend Cursor :P
+            Made with ❤️ by Anmol Pandey, with a little help from his trusty friend, Cursor. 😄
           </p>
           
           <p className="text-slate-600">
-            This app was created to help you track your expenses and income without breaking a sweat. 
-            Unlike your bank account, this app won't judge you for that late-night pizza order!
+            This app makes tracking your expenses and income effortless—no judgment, just insights! Unlike your bank account, it won't side-eye your late-night pizza splurges. 🍕
           </p>
           
           <p className="text-slate-600">
-            Remember, saving money is like doing squats - nobody wants to do it, but everyone feels better after!
+            Remember, saving money is like doing squats—nobody loves it, but you'll thank yourself later!
           </p>
           
           <div className="pt-4 border-t border-slate-200 text-center">
             <p className="text-sm text-slate-500">Version 1.0.0</p>
-            <p className="text-sm text-slate-500">© 2024 ExpenseCal</p>
+            <p className="text-sm text-slate-500">© 2025 ExpenseCal</p>
           </div>
         </div>
       </div>

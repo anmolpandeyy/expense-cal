@@ -17,7 +17,7 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<'main' | 'chart' | 'export' | 'import'>('main');
   const [isMounted, setIsMounted] = useState(false);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
-  const [isEditingTransaction, setIsEditingTransaction] = useState(false);
+  const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null);
   const { exportData, importData } = useAppStore();
   
   // Handle client-side mounting to prevent hydration errors
@@ -95,15 +95,14 @@ export default function Home() {
   };
   
   const handleEditTransaction = (id: string) => {
+    setEditingTransactionId(id);
     setSelectedTransactionId(null);
-    setIsEditingTransaction(true);
     setIsAddingTransaction(true);
   };
   
   const handleCloseTransactionForm = () => {
     setIsAddingTransaction(false);
-    setIsEditingTransaction(false);
-    setSelectedTransactionId(null);
+    setEditingTransactionId(null);
   };
   
   // Function to handle empty state
@@ -176,7 +175,7 @@ export default function Home() {
         {isAddingTransaction ? (
           <AddTransactionForm 
             onClose={handleCloseTransactionForm} 
-            transactionId={isEditingTransaction ? selectedTransactionId || undefined : undefined}
+            transactionId={editingTransactionId || undefined}
           />
         ) : currentView === 'chart' ? (
           <ExpenseChart />
