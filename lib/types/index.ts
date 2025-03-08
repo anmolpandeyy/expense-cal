@@ -108,4 +108,11 @@ export type AppState = {
    * @param data - JSON string containing transactions and categories
    */
   importData: (data: string) => void;
+  
+  /**
+   * Imports data from a CSV file.
+   * @param csvData - CSV data as a string
+   * @returns Object with success status and message
+   */
+  importCSV: (csvData: string) => { success: boolean; message: string };
 }; 
