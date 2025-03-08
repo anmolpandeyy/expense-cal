@@ -14,7 +14,24 @@ const inter = Inter({ subsets: ['latin'] });
  */
 export const metadata: Metadata = {
   title: 'ExpenseCal - Expense Calculator',
-  description: 'A simple expense calculator app',
+  description: 'A mobile-first expense tracking application',
+  manifest: '/expense-cal/manifest.json',
+  themeColor: '#818cf8',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'ExpenseCal',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  icons: {
+    icon: '/expense-cal/icons/icon-192x192.png',
+    apple: '/expense-cal/icons/icon-192x192.png',
+  },
 };
 
 /**
@@ -32,6 +49,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="application-name" content="ExpenseCal" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="ExpenseCal" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/expense-cal/icons/icon-192x192.png" />
+      </head>
       <body className={inter.className}>
         <main className="max-w-md mx-auto bg-white min-h-screen">
           {children}
